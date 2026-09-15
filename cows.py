@@ -15,6 +15,12 @@ dp = Dispatcher()
 class Milk(StatesGroup):
     wait_milk_count_for_sale = State()
 
+class Cows(StatesGroup):
+    name = State()
+    income = State()
+    price = State()
+    code = State()
+
 @dp.message(Command("start"))
 async def start(message: types.Message):
     print(message.from_user.id)
@@ -28,9 +34,6 @@ async def start(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="Обновить", callback_data="back_to_main_menu")]])
     await message.answer(f"{stat(user_id=message.from_user.id)}", reply_markup=keyboard)
 
-async def func():
-    pass
-
 @dp.callback_query(F.data.startswith("my_cows"))
 async def my_cows(callback: types.CallbackQuery):
     cows = my_cows_func(callback.message.chat.id)
@@ -43,6 +46,36 @@ async def back_to_main_menu(callback: types.CallbackQuery, state: FSMContext):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="Обновить", callback_data="back_to_main_menu")]])
     await callback.message.edit_text(f"{stat(user_id=callback.message.chat.id)}", reply_markup=keyboard)
     await state.clear()
+
+@dp.message(Command("add_cow"))
+async def add_cow(message: types.Message, state: FSMContext):
+    await message.answer("Введите навание коровы")
+    await state.set_state(Cows.name)
+
+@dp.message(Cows.name)
+async def set_name(message: types.Message, state: FSMContext):
+    await state.update_data(name = message.text)
+    await message.answer("Введите доход коровы")
+    await state.set_state(Cows.income)
+
+@dp.message(Cows.income)
+async def set_income(message: types.Message, state: FSMContext):
+    await state.update_data(income = int(message.text))
+    await message.answer("Введите цену коровы")
+    await state.set_state(Cows.price)
+
+@dp.message(Cows.price)
+async def set_price(message: types.Message, state: FSMContext):
+    await state.update_data(price = int(message.text))
+    await message.answer("Введите код коровы на английском")
+    await state.set_state(Cows.code)
+
+@dp.message(Cows.code)
+async def set_code(message: types.Message, state: FSMContext):
+    await state.update_data(code = message.text)
+    new_cow = await state.get_data()
+    await state.clear()
+    register_new_cow(new_cow["name"], new_cow["income"], new_cow["price"], new_cow["code"])
 
 async def periodic_task():
     while True:

@@ -20,6 +20,15 @@ def get_user(user_id):
     cur.execute("SELECT * FROM Пользователи WHERE id = ?", (user_id,))
     return cur.fetchone()
 
+def add_new_cow(cow_name, cow_income, cow_price, cow_code):
+    cur.execute("INSERT INTO Коровы(Название, Доход, Цена, Код) VALUES(?, ?, ?, ?)", (cow_name, cow_income, cow_price, cow_code,))
+    con.commit()
+    
+def register_new_cow(cow_name, cow_income, cow_price, cow_code):
+    add_new_cow(cow_name, cow_income, cow_price, cow_code)
+    cur.execute(f"ALTER TABLE Пользователи ADD {cow_code} INTEGER DEFAULT 0")
+    con.commit()
+
 def add_milk(user_id, count):
     cur.execute("SELECT Молоко FROM Пользователи WHERE id = ?", (user_id,))
     milk = cur.fetchone()[0]
