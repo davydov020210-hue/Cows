@@ -28,6 +28,9 @@ async def start(message: types.Message):
     keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="Обновить", callback_data="back_to_main_menu")]])
     await message.answer(f"{stat(user_id=message.from_user.id)}", reply_markup=keyboard)
 
+async def func():
+    pass
+
 @dp.callback_query(F.data.startswith("my_cows"))
 async def my_cows(callback: types.CallbackQuery):
     cows = my_cows_func(callback.message.chat.id)
