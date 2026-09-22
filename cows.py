@@ -31,19 +31,19 @@ async def start(message: types.Message):
 
     update(user_id=message.from_user.id)
 
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="Обновить", callback_data="back_to_main_menu")]])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🐄Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="💵Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="🥛Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="🔄Обновить", callback_data="back_to_main_menu")]])
     await message.answer(f"{stat(user_id=message.from_user.id)}", reply_markup=keyboard)
 
 @dp.callback_query(F.data.startswith("my_cows"))
 async def my_cows(callback: types.CallbackQuery):
     cows = my_cows_func(callback.message.chat.id)
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Назад", callback_data="back_to_main_menu")]])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="⬅Назад", callback_data="back_to_main_menu")]])
     await callback.message.edit_text(cows, reply_markup=keyboard)
 
 @dp.callback_query(F.data == "back_to_main_menu")
 async def back_to_main_menu(callback: types.CallbackQuery, state: FSMContext):
     update(user_id=callback.message.chat.id)
-    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="Обновить", callback_data="back_to_main_menu")]])
+    keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="🐄Мои коровы", callback_data="my_cows"), InlineKeyboardButton(text="💵Купить коров", callback_data="buy_cows"), InlineKeyboardButton(text="🥛Продать молоко", callback_data="sell_milk")], [InlineKeyboardButton(text="🔄Обновить", callback_data="back_to_main_menu")]])
     await callback.message.edit_text(f"{stat(user_id=callback.message.chat.id)}", reply_markup=keyboard)
     await state.clear()
 
@@ -105,7 +105,7 @@ async def sell_milk_percent(callback: types.CallbackQuery):
 
     result = sell_milk_func(user_id=callback.from_user.id, user_milk_sell=amount)
 
-    await callback.message.edit_text(f"Продано молока: {amount}\n Получено: {amount * MILK_PRICE} руб\n {result}", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Продать ещё",callback_data="sell_milk")],[InlineKeyboardButton(text="Назад",callback_data="back_to_main_menu")]]))
+    await callback.message.edit_text(f"🥛Продано молока: {amount}\n 💵Получено: {amount * MILK_PRICE} руб\n {result}", reply_markup=InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="💵Продать ещё",callback_data="sell_milk")],[InlineKeyboardButton(text="⬅Назад",callback_data="back_to_main_menu")]]))
 
 #@dp.callback_query(F.data == "update")
 #async def update
@@ -114,14 +114,14 @@ async def sell_milk_percent(callback: types.CallbackQuery):
 async def choose_cow(callback: types.CallbackQuery):
 
     choose_keyboard = InlineKeyboardMarkup(inline_keyboard=cow_keyboard())
-    await callback.message.edit_text("Выберите корову:", reply_markup=choose_keyboard)
+    await callback.message.edit_text("🐄Выберите корову:", reply_markup=choose_keyboard)
 
 def cow_keyboard():
     buttons = []
     
     for cow in get_cows():
         buttons.append([InlineKeyboardButton(text=f"{cow[1]}, {cow[3]}руб.", callback_data=f"buy-ask_{cow[0]}")])
-    buttons.append([InlineKeyboardButton(text="Главное меню", callback_data="back_to_main_menu")])
+    buttons.append([InlineKeyboardButton(text="🏠Главное меню", callback_data="back_to_main_menu")])
     return buttons
 
 @dp.callback_query(F.data.startswith("buy-ask"))
@@ -129,8 +129,8 @@ async def buy_normal__cow(callback: types.CallbackQuery):
     cow_id = callback.data.replace("buy-ask_", "")
     cow = get_cow(cow_id)
     if cow:
-        buy_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="Да", callback_data=f"buy_{cow_id}"), InlineKeyboardButton(text="Нет", callback_data="no_buy")]])
-        await callback.message.edit_text(f"Цена коровы: {cow[3]}", reply_markup=buy_keyboard)
+        buy_keyboard = InlineKeyboardMarkup(inline_keyboard=[[InlineKeyboardButton(text="✅Да", callback_data=f"buy_{cow_id}"), InlineKeyboardButton(text="❌Нет", callback_data="no_buy")]])
+        await callback.message.edit_text(f"💵Цена коровы: {cow[3]}", reply_markup=buy_keyboard)
     else:
         await callback.answer("Корова не найдена")
 
@@ -141,16 +141,16 @@ async def buy_cow(callback: types.CallbackQuery):
     result = buy_cow_func(user_id=callback.from_user.id, cow_id=cow_id)
 
     if result:
-        await callback.answer("Корова приобретена")
+        await callback.answer("✅Корова приобретена")
         await choose_cow(callback)
     else:
-        await callback.answer("Ошибка при покупке")
+        await callback.answer("❌Ошибка при покупке")
         await choose_cow(callback)
 
 @dp.callback_query(F.data.startswith("reg"))
 async def register(callback: types.CallbackQuery):
     reg(callback.from_user.id)
-    await callback.message.answer("Пользователь добвлен")
+    await callback.message.answer("✅Пользователь добвлен")
     await callback.message.answer(text=my_cows_func(callback.from_user.id))
 
 @dp.message(Milk.wait_milk_count_for_sale)

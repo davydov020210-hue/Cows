@@ -159,7 +159,6 @@ def buy_cow_func(user_id, cow_id):
         return True
     else:
         return False
-    
 
 def my_cows_func(user_id):
     cows = get_cows()
