@@ -6,7 +6,7 @@ from aiogram.filters.command import Command
 from aiogram.fsm.state import StatesGroup, State
 from aiogram.fsm.context import FSMContext
 from func import *
-
+# bebebe
 logging.basicConfig(level=logging.INFO)
 
 bot = Bot(token="8769780535:AAGa3m15uSR7IYa_U74OLVUHUNjKZabGUiM")
